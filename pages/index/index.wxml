@@ -1,0 +1,6 @@
+<!--index.wxml-->
+<view class="container">
+  
+  <audio class="shake-hard"  poster="" name="hello" author="XB" src="{{resp.src}}" id="myAudio"></audio>
+  <view class="shake-rotate {{isShaking?'run':'stop'}} myshake">Shake it!</view>
+</view>
