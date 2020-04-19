@@ -1,41 +1,89 @@
-//index.js
-//获取应用实例
-const app = getApp()
-
+const innerAudioContext = wx.createInnerAudioContext()
 Page({
+
   data: {
-    isShaking: false,
-    lastShakeTime: 0,
-    accelerometerChangeDelayTime: 0,
+    startTime:0,
+    x:0,
+    y:0,
+    isFirstCallBack:true,
+    isExecute:false,
+    isShow: false,
+    list: [],
+    shakeTip:'',
     resp: {},
     audioCtx:null,
-    backgroundAudioManager:null
-  },
-  
-  onLoad: function () {
+  }, 
+  onReady: function(){
     
   },
   onShow: function(){
-    
-  },
-  onReady: function(){
-    // let backgroundAudioManager = wx.getBackgroundAudioManager()
-    // this.setData({backgroundAudioManager: backgroundAudioManager });
-    // // this.audioCtx.play()
-    // backgroundAudioManager.title = 'BG Music'
-    // backgroundAudioManager.epname = ''
-    // backgroundAudioManager.singer = ''
-    // backgroundAudioManager.coverImgUrl = ''
-    // backgroundAudioManager.src = 'https://static.leizhenxd.com/audio2.mp3'
-    
-    // console.log(backgroundAudioManager)
-    
+    innerAudioContext.src = 'https://static.leizhenxd.com/shake.mp3'
+    innerAudioContext.volume = 0
+    innerAudioContext.play();
     this.fetch()
-    this.listenAccelerometerChange()
-    // this.data.backgroundAudioManager.pause();
+  },
+  addListener: function () {
+    
+    var that = this;
+    that.isShow = true;
+    wx.onAccelerometerChange(function (e) {
+      console.log("###",e)
+      if (!that.isShow) {
+        return
+      }
+      if (that.data.isFirstCallBack) {
+        that.setData({
+          startTime: (new Date()).getTime(),
+          x : e.x,
+          y : e.y,
+          isFirstCallBack:false
+        })
+      } else {
+        var endTime = (new Date()).getTime()
+        var speedX = (e.x - that.data.x) / (endTime - that.data.startTime) * 100000
+        var speedY = (e.y - that.data.y) / (endTime - that.data.startTime) * 100000
+        that.setData({
+          startTime:endTime,
+          x:e.x,
+          y:e.y
+        })
+        if ((Math.abs(speedX) > 1000) || (Math.abs(speedY) > 1000)) {
+          if (that.data.isExecute) {
+            console.log("正在执行")
+          } else {
+            //that.data.audioCtx.play()
+            
+            innerAudioContext.play();
+            wx.vibrateLong({})
+           
+            that.setData({
+              isExecute:true,
+              shakeTip:"摇成功"
+            })
+            //that.data.audioCtx.play()
+            setTimeout(function () {
+              that.setData({
+                isExecute: false,
+                shakeTip: ""
+              })
+            }, 1000)
+          }
+        }
+      }
+    })
+  },
+  audioPlay: function () {
+    console.log(innerAudioContext)
+    if(innerAudioContext.paused)
+      innerAudioContext.play()
+    else
+      innerAudioContext.pause()
   },
   fetch: function(){
     let that = this;
+    // wx.showLoading({
+    //   title: '加载中',
+    // })
     wx.request({
       url: 'https://wx.leizhenxd.com/test/fetch', //仅为示例，并非真实的接口地址
       data: {},
@@ -44,64 +92,45 @@ Page({
         'content-type': 'application/json' // 默认值
       },
       success(res) {
+        that.setData({ resp: res.data});
+        that.download(res.data.src)
+      },
+      complete:function(){
+      //  wx.hideLoading()
+      }
+    })
+  },
+  download: function(url){
+    let that = this
+    wx.showLoading({
+      title: '加载中',
+    })
+    wx.downloadFile({
+      url: url, //仅为示例，并非真实的资源
+      header: {
+        'content-type': 'application/octet-stream',
+      },
+      // filePath: wx.env.USER_DATA_PATH + '/temp/',
+      success (res) {
+        // 只要服务器有响应数据，就会把响应内容写入文件并进入 success 回调，业务需要自行判断是否下载到了想要的内容
         console.log(res)
-        let audioCtx = wx.createAudioContext("myAudio", that)
-        that.setData({ resp: res.data, audioCtx: audioCtx});
+        if (res.statusCode === 200) {
+          innerAudioContext.volume = 1
+          innerAudioContext.src = res.tempFilePath
+          that.addListener()
+        }
+      },
+      fail(e) {
+        console.log(e)
+      },
+      complete:function(){
+        wx.hideLoading()
       }
     })
   },
-  listenAccelerometerChange: function(){
-    let _this = this;
-    const maxSpeed = 1;
-    wx.startAccelerometer({
-      interval: 'game',
-      success: function () {
-        console.log("startAccelerometer")
-        wx.onAccelerometerChange(function (acceleration) {
-          let currMils = new Date().getTime()
-          if ((currMils-_this.data.accelerometerChangeDelayTime)<300) return;
-          let speed = acceleration.x
-         // console.log(speed)
-          if (speed > maxSpeed||acceleration.y>maxSpeed||acceleration.z>maxSpeed) {
-            console.log("send msg", _this.data.audioCtx)
-            _this.data.lastShakeTime = currMils
-            _this.setData({ isShaking: true })
-            
-          }
-          if(_this.data.isShaking && speed <=maxSpeed) {
-            wx.vibrateShort()
-            _this.audioPlay();
-          }
-          if (speed <= maxSpeed) {
-            // _this.bgaudioPause()
-            _this.setData({ isShaking: false })
-          }
-          _this.setData({ accelerometerChangeDelayTime: currMils})
-        })
-      }
-    })
-  },
-  audioPlay: function () {
-      this.data.audioCtx.play()
-  },
-  audioPause: function () {
-    this.data.audioCtx.pause()
-  },
-  audio14: function () {
-    this.data.audioCtx.seek(14)
-  },
-  audioStart: function () {
-    this.data.audioCtx.seek(0)
-  },
-  bgaudioPlay: function () {
-    if (this.data.backgroundAudioManager.paused)
-      this.data.backgroundAudioManager.play()
-  },
-  bgaudioPause: function () {
-    if(!this.data.backgroundAudioManager.paused)
-      this.data.backgroundAudioManager.pause()
-  },
-  onShareAppMessage: function(){
-
+  onUnload: function () {
+    this.isShow = false;
+    wx.stopAccelerometer({})
+    innerAudioContext.destroy()
   }
 })

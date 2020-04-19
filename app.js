@@ -32,6 +32,20 @@ App({
         }
       }
     })
+
+    var music = wx.setInnerAudioOption({
+      obeyMuteSwitch: false,
+      success: function(res) { 
+      console.log('开启静音模式下播放音乐的功能');
+      },
+      
+      fail: function(res) {
+      
+      console.log('静音设置失败');
+      
+      }
+      
+      });
   },
   globalData: {
     userInfo: null

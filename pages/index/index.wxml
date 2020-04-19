@@ -1,6 +1,12 @@
 <!--index.wxml-->
 <view class="container">
-  
-  <audio class="shake-hard"  poster="" name="hello" author="XB" src="{{resp.src}}" id="myAudio"></audio>
-  <view class="shake-rotate {{isShaking?'run':'stop'}} myshake">Shake it!</view>
+  <view class="shake-rotate {{isExecute?'run':'stop'}} myshake" bindtap="audioPlay">Shake it!</view>
 </view>
+<!-- <view class="container">
+  <view class="view-row" style="color:#aaa;font-size:36rpx;margin:30rpx;border-bottom:1rpx solid #aaa;padding:10rpx">hardware—摇一摇</view>
+    <view style="font-size:32rpx;color:#aaa">加速计实现</view>
+    <view>
+      <image style="width:240rpx;height:240rpx;margin-top:50rpx" src="./shake.png"></image>
+      <view style="margin-top:30rpx;font-size:40rpx;color:black">{{shakeTip}}</view>
+    </view>
+</view> -->
