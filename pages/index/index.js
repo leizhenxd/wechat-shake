@@ -22,6 +22,18 @@ Page({
     innerAudioContext.play();
     this.fetch()
   },
+  addTimeUpdateListener: function(){
+    let that = this;
+    innerAudioContext.onTimeUpdate(function(){
+      innerAudioContext.paused
+      console.log(innerAudioContext.currentTime, innerAudioContext.duration);
+    })
+    innerAudioContext.onEnded(function(){
+      console.log("end")
+      
+     // that.addTimeUpdateListener()
+    })
+  },
   addListener: function () {
     
     var that = this;
@@ -118,6 +130,7 @@ Page({
           innerAudioContext.volume = 1
           innerAudioContext.src = res.tempFilePath
           that.addListener()
+          that.addTimeUpdateListener()
         }
       },
       fail(e) {

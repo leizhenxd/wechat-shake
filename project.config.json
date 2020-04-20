@@ -26,7 +26,7 @@
 	"compileType": "miniprogram",
 	"libVersion": "2.10.4",
 	"appid": "wx42afbce882b40eba",
-	"projectname": "shake",
+	"projectname": "wechat-shake",
 	"debugOptions": {
 		"hidedInDevtools": []
 	},
