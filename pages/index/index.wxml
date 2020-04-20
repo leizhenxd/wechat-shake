@@ -1,6 +1,7 @@
 <!--index.wxml-->
 <view class="container">
-  <view class="shake-rotate {{isExecute?'run':'stop'}} myshake" bindtap="audioPlay">Shake it!</view>
+  <image src="shake.png" class="shake-rotate {{isExecute?'run':'stop'}} myshake"  style="height:120px;padding:0px;" mode="heightFix"></image>
+  <view >{{resp.name}}</view>
 </view>
 <!-- <view class="container">
   <view class="view-row" style="color:#aaa;font-size:36rpx;margin:30rpx;border-bottom:1rpx solid #aaa;padding:10rpx">hardware—摇一摇</view>
