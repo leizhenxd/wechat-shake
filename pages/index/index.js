@@ -12,6 +12,9 @@ Page({
     shakeTip:'',
     resp: {},
     audioCtx:null,
+    isBg: false,
+    ifSpread: false,
+    currentTime: 0 //当前播放进度
   }, 
   onReady: function(){
     
@@ -22,12 +25,23 @@ Page({
     innerAudioContext.play();
     this.fetch()
   },
+  addTimeUpdateListener: function(){
+    let that = this;
+    innerAudioContext.onTimeUpdate(function(){
+      if(that.data.isBg && ((new Date().getTime()-that.data.currentTime)/1000) >=2) {
+        console.log(((new Date().getTime()-that.data.currentTime)/1000))
+        innerAudioContext.stop();
+      }
+    })
+    innerAudioContext.onEnded(function(){
+      
+    })
+  },
   addListener: function () {
     
     var that = this;
     that.isShow = true;
     wx.onAccelerometerChange(function (e) {
-      console.log("###",e)
       if (!that.isShow) {
         return
       }
@@ -53,8 +67,8 @@ Page({
           } else {
             //that.data.audioCtx.play()
             
-            innerAudioContext.play();
-            wx.vibrateLong({})
+            that.audioPlay();
+            wx.vibrateShort({})
            
             that.setData({
               isExecute:true,
@@ -66,7 +80,7 @@ Page({
                 isExecute: false,
                 shakeTip: ""
               })
-            }, 1000)
+            }, 500)
           }
         }
       }
@@ -74,10 +88,16 @@ Page({
   },
   audioPlay: function () {
     console.log(innerAudioContext)
-    if(innerAudioContext.paused)
+    if(innerAudioContext.paused){
       innerAudioContext.play()
-    else
-      innerAudioContext.pause()
+    }
+    this.setData({
+      currentTime: new Date().getTime()
+    })
+    
+    setTimeout(() => {
+      console.log(innerAudioContext.paused)
+    }, 100)
   },
   fetch: function(){
     let that = this;
@@ -93,6 +113,11 @@ Page({
       },
       success(res) {
         that.setData({ resp: res.data});
+        if(res.data.src.indexOf('Funk_Bass') != -1 || res.data.src.indexOf('Beatlt_Drums') != -1 || res.data.src.indexOf('Lover_Drums') != -1){
+          that.setData({
+            isBg: true
+          })
+        }
         that.download(res.data.src)
       },
       complete:function(){
@@ -118,6 +143,7 @@ Page({
           innerAudioContext.volume = 1
           innerAudioContext.src = res.tempFilePath
           that.addListener()
+          that.addTimeUpdateListener()
         }
       },
       fail(e) {
@@ -127,6 +153,9 @@ Page({
         wx.hideLoading()
       }
     })
+  },
+  change: function(){
+    this.fetch();
   },
   onUnload: function () {
     this.isShow = false;

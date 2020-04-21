@@ -10,3 +10,10 @@ page{
 .myshake {
   font-size: 2rem;
 }
+.change{
+  position: absolute;
+  top:20px;
+  right: 20px;
+  background-color: silver;
+  padding: 10px;
+}
