@@ -28,13 +28,13 @@ Page({
   addTimeUpdateListener: function(){
     let that = this;
     innerAudioContext.onTimeUpdate(function(){
-      if(that.data.isBg && ((new Date().getTime()-that.data.currentTime)/1000) >=2) {
-        console.log(((new Date().getTime()-that.data.currentTime)/1000))
-        innerAudioContext.stop();
-      }
+      innerAudioContext.paused
+      console.log(innerAudioContext.currentTime, innerAudioContext.duration);
     })
     innerAudioContext.onEnded(function(){
+      console.log("end")
       
+     // that.addTimeUpdateListener()
     })
   },
   addListener: function () {
