@@ -1,13 +1,9 @@
 <!--index.wxml-->
 <view class="container">
-<<<<<<< HEAD
   <view class="change" bindtap="change">换一个</view>
   <image class="shake-rotate {{isExecute?'run':'stop'}} myshake" style="width:60px" src="shake.png" mode="heightFix"></image>
   <view>{{resp.name}}</view>
-=======
-  <image src="shake.png" class="shake-rotate {{isExecute?'run':'stop'}} myshake"  style="height:120px;padding:0px;" mode="heightFix"></image>
-  <view >{{resp.name}}</view>
->>>>>>> 584bf6e983ddabb67e6f08126cc36320cb7169df
+
 </view>
 <!-- <view class="container">
   <view class="view-row" style="color:#aaa;font-size:36rpx;margin:30rpx;border-bottom:1rpx solid #aaa;padding:10rpx">hardware—摇一摇</view>

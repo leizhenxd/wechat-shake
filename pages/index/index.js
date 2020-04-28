@@ -33,7 +33,9 @@ Page({
     })
     innerAudioContext.onEnded(function(){
       console.log("end")
-      
+      if(this.data.isBg) {
+        this.audioPlay()
+      }
      // that.addTimeUpdateListener()
     })
   },
@@ -161,5 +163,8 @@ Page({
     this.isShow = false;
     wx.stopAccelerometer({})
     innerAudioContext.destroy()
+  },
+  onShareAppMessage: function(){
+    
   }
 })
