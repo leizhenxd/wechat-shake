@@ -30,11 +30,15 @@ Page({
     innerAudioContext.onTimeUpdate(function(){
       innerAudioContext.paused
       console.log(innerAudioContext.currentTime, innerAudioContext.duration);
+	  let crt = new Date().getTime();
+	  if((crt-that.data.currentTime)/1000 >=2){
+		innerAudioContext.stop();
+	  }
     })
     innerAudioContext.onEnded(function(){
       console.log("end")
-      if(this.data.isBg) {
-        this.audioPlay()
+      if(that.data.isBg) {
+        that.audioPlay()
       }
      // that.addTimeUpdateListener()
     })
