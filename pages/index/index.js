@@ -2,49 +2,57 @@ const innerAudioContext = wx.createInnerAudioContext()
 Page({
 
   data: {
-    startTime:0,
-    x:0,
-    y:0,
-    isFirstCallBack:true,
-    isExecute:false,
+    startTime: 0,
+    x: 0,
+    y: 0,
+    isFirstCallBack: true,
+    isExecute: false,
     isShow: false,
     list: [],
-    shakeTip:'',
+    shakeTip: '',
     resp: {},
-    audioCtx:null,
+    audioCtx: null,
     isBg: false,
     ifSpread: false,
     currentTime: 0 //当前播放进度
-  }, 
-  onReady: function(){
-    
   },
-  onShow: function(){
+  onReady: function () {
+
+  },
+  onShow: function () {
     innerAudioContext.src = 'https://static.leizhenxd.com/shake.mp3'
     innerAudioContext.volume = 0
     innerAudioContext.play();
     this.fetch()
   },
-  addTimeUpdateListener: function(){
+  addTimeUpdateListener: function () {
     let that = this;
-    innerAudioContext.onTimeUpdate(function(){
+    innerAudioContext.onTimeUpdate(function () {
       innerAudioContext.paused
       console.log(innerAudioContext.currentTime, innerAudioContext.duration);
-	  let crt = new Date().getTime();
-	  if((crt-that.data.currentTime)/1000 >=2){
-		innerAudioContext.stop();
-	  }
-    })
-    innerAudioContext.onEnded(function(){
-      console.log("end")
-      if(that.data.isBg) {
-        that.audioPlay()
+      let crt = new Date().getTime();
+      if((crt-that.data.currentTime)/1000 >=2){
+        innerAudioContext.stop();
       }
-     // that.addTimeUpdateListener()
+      if(that.data.isBg && (innerAudioContext.duration-innerAudioContext.currentTime)<0.27){
+       // innerAudioContext.seek(0)
+        setTimeout(()=>{
+          innerAudioContext.seek(0)
+        }, (innerAudioContext.duration-innerAudioContext.currentTime)*1000-100)
+        setTimeout(() => {
+          console.log(innerAudioContext.paused)
+        },  (innerAudioContext.duration-innerAudioContext.currentTime)*1000+100)
+      }
+    })
+    innerAudioContext.onEnded(function () {
+      console.log("end")
+      // if(that.data.isBg) {
+      //   that.audioPlay()
+      // }
     })
   },
   addListener: function () {
-    
+
     var that = this;
     that.isShow = true;
     wx.onAccelerometerChange(function (e) {
@@ -54,31 +62,31 @@ Page({
       if (that.data.isFirstCallBack) {
         that.setData({
           startTime: (new Date()).getTime(),
-          x : e.x,
-          y : e.y,
-          isFirstCallBack:false
+          x: e.x,
+          y: e.y,
+          isFirstCallBack: false
         })
       } else {
         var endTime = (new Date()).getTime()
         var speedX = (e.x - that.data.x) / (endTime - that.data.startTime) * 100000
         var speedY = (e.y - that.data.y) / (endTime - that.data.startTime) * 100000
         that.setData({
-          startTime:endTime,
-          x:e.x,
-          y:e.y
+          startTime: endTime,
+          x: e.x,
+          y: e.y
         })
         if ((Math.abs(speedX) > 1000) || (Math.abs(speedY) > 1000)) {
           if (that.data.isExecute) {
             console.log("正在执行")
           } else {
             //that.data.audioCtx.play()
-            
+
             that.audioPlay();
             wx.vibrateShort({})
-           
+
             that.setData({
-              isExecute:true,
-              shakeTip:"摇成功"
+              isExecute: true,
+              shakeTip: "摇成功"
             })
             //that.data.audioCtx.play()
             setTimeout(function () {
@@ -93,19 +101,19 @@ Page({
     })
   },
   audioPlay: function () {
-    console.log(innerAudioContext)
-    if(innerAudioContext.paused){
+    //innerAudioContext.loop = true
+    if (innerAudioContext.paused) {
       innerAudioContext.play()
     }
     this.setData({
       currentTime: new Date().getTime()
     })
-    
-    setTimeout(() => {
-      console.log(innerAudioContext.paused)
-    }, 100)
+
+    // setTimeout(() => {
+    //   console.log(innerAudioContext.paused)
+    // }, 100)
   },
-  fetch: function(){
+  fetch: function () {
     let that = this;
     // wx.showLoading({
     //   title: '加载中',
@@ -118,20 +126,22 @@ Page({
         'content-type': 'application/json' // 默认值
       },
       success(res) {
-        that.setData({ resp: res.data});
-        if(res.data.src.indexOf('Funk_Bass') != -1 || res.data.src.indexOf('Beatlt_Drums') != -1 || res.data.src.indexOf('Lover_Drums') != -1){
+        that.setData({
+          resp: res.data
+        });
+        if (res.data.src.indexOf('_110_') != -1) {
           that.setData({
             isBg: true
           })
         }
         that.download(res.data.src)
       },
-      complete:function(){
-      //  wx.hideLoading()
+      complete: function () {
+        //  wx.hideLoading()
       }
     })
   },
-  download: function(url){
+  download: function (url) {
     let that = this
     wx.showLoading({
       title: '加载中',
@@ -142,7 +152,7 @@ Page({
         'content-type': 'application/octet-stream',
       },
       // filePath: wx.env.USER_DATA_PATH + '/temp/',
-      success (res) {
+      success(res) {
         // 只要服务器有响应数据，就会把响应内容写入文件并进入 success 回调，业务需要自行判断是否下载到了想要的内容
         console.log(res)
         if (res.statusCode === 200) {
@@ -155,12 +165,12 @@ Page({
       fail(e) {
         console.log(e)
       },
-      complete:function(){
+      complete: function () {
         wx.hideLoading()
       }
     })
   },
-  change: function(){
+  change: function () {
     this.fetch();
   },
   onUnload: function () {
@@ -168,7 +178,7 @@ Page({
     wx.stopAccelerometer({})
     innerAudioContext.destroy()
   },
-  onShareAppMessage: function(){
-    
+  onShareAppMessage: function () {
+
   }
 })
