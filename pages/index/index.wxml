@@ -1,7 +1,7 @@
 <!--index.wxml-->
 <view class="container">
   <view class="change" bindtap="change">换一个</view>
-  <image class="shake-rotate {{isExecute?'run':'stop'}} myshake" style="width:60px" src="shake.png" mode="heightFix"></image>
+  <image class="shake-rotate {{isExecute?'run':'stop'}} myshake" style="width:60px" src="shake.png" mode="heightFix" bindtap="audioPlay"></image>
   <view>{{resp.name}}</view>
 
 </view>
