@@ -123,7 +123,7 @@ Page({
       },
       success(res) {
         that.setData({ resp: res.data});
-        if(res.data.src.indexOf('_110_') != -1){
+        if(res.data.src.indexOf('110_') != -1){
           that.setData({
             isBg: true
           })
