@@ -17,7 +17,7 @@ Page({
     currentTime: 0 //当前播放进度
   }, 
   onReady: function(){
-    
+   
   },
   onShow: function(){
     innerAudioContext.src = 'https://static.leizhenxd.com/shake.mp3'
@@ -32,13 +32,16 @@ Page({
       console.log(innerAudioContext.currentTime, innerAudioContext.duration);
 	  let crt = new Date().getTime();
 	  if((crt-that.data.currentTime)/1000 >=2){
-		innerAudioContext.stop();
-	  }
+	//	innerAudioContext.stop();
+    }
+    if(innerAudioContext.duration - innerAudioContext.currentTime < 0.2) {
+     // innerAudioContext.seek(0)
+    }
     })
     innerAudioContext.onEnded(function(){
       console.log("end")
       if(that.data.isBg) {
-        that.audioPlay()
+     //    that.audioPlay()
       }
      // that.addTimeUpdateListener()
     })
@@ -94,6 +97,7 @@ Page({
   },
   audioPlay: function () {
     console.log(innerAudioContext)
+    innerAudioContext.loop = true
     if(innerAudioContext.paused){
       innerAudioContext.play()
     }
@@ -103,7 +107,7 @@ Page({
     
     setTimeout(() => {
       console.log(innerAudioContext.paused)
-    }, 100)
+    }, 30)
   },
   fetch: function(){
     let that = this;
@@ -119,7 +123,7 @@ Page({
       },
       success(res) {
         that.setData({ resp: res.data});
-        if(res.data.src.indexOf('Funk_Bass') != -1 || res.data.src.indexOf('Beatlt_Drums') != -1 || res.data.src.indexOf('Lover_Drums') != -1){
+        if(res.data.src.indexOf('_110_') != -1){
           that.setData({
             isBg: true
           })
