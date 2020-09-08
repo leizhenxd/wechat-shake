@@ -20,11 +20,11 @@ Page({
 
   },
   onShow: function () {
-    innerAudioContext.src = 'https://static.leizhenxd.com/shake.mp3'
+    innerAudioContext.src = 'https://leistatic.leizhenxd.com/shake.mp3'
     innerAudioContext.volume = 0
     innerAudioContext.play();
     this.fetch()
-  },
+  },lei
   addTimeUpdateListener: function () {
     let that = this;
     innerAudioContext.onTimeUpdate(function () {
@@ -118,7 +118,7 @@ Page({
     //   title: '加载中',
     // })
     wx.request({
-      url: 'https://wx.leizhenxd.com/test/fetch', //仅为示例，并非真实的接口地址
+      url: 'https://lei.leizhenxd.com/test/fetch', //仅为示例，并非真实的接口地址
       data: {},
       dataType: 'json',
       header: {
