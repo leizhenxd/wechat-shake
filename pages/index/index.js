@@ -24,7 +24,7 @@ Page({
     innerAudioContext.volume = 0
     innerAudioContext.play();
     this.fetch()
-  },lei
+  },
   addTimeUpdateListener: function () {
     let that = this;
     innerAudioContext.onTimeUpdate(function () {
